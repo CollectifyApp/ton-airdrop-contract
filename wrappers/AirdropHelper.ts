@@ -35,8 +35,8 @@ export class AirdropHelper implements Contract {
         });
     }
 
-    async sendClaim(provider: ContractProvider, queryId: bigint, proof: Cell) {
-        await provider.external(beginCell().storeUint(queryId, 64).storeRef(proof).endCell());
+    async sendClaim(provider: ContractProvider, queryId: bigint, proof: Cell, recipient: Address) {
+        await provider.external(beginCell().storeUint(queryId, 64).storeRef(proof).storeAddress(recipient).endCell());
     }
 
     async getClaimed(provider: ContractProvider): Promise<boolean> {

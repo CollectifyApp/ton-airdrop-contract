@@ -1,5 +1,5 @@
 import { Blockchain, SandboxContract, TreasuryContract } from '@ton/sandbox';
-import { Cell, Dictionary, beginCell, toNano } from '@ton/core';
+import { BitString, Cell, Dictionary, beginCell, toNano } from '@ton/core';
 import { Airdrop, AirdropEntry, generateEntriesDictionary } from '../wrappers/Airdrop';
 import '@ton/test-utils';
 import { compile } from '@ton/blueprint';
@@ -36,7 +36,7 @@ describe('Airdrop', () => {
         entries = [];
         for (let i = 0; i < 1000; i++) {
             entries.push({
-                address: users[parseInt(i.toString())].address,
+                code: new BitString(Buffer.from(i.toString()), 0, 256),
                 amount: BigInt(Math.floor(Math.random() * 1e9)),
             });
         }
@@ -107,7 +107,7 @@ describe('Airdrop', () => {
             )
         );
         await helper.sendDeploy(users[1].getSender());
-        const result = await helper.sendClaim(123n, merkleProof);
+        const result = await helper.sendClaim(123n, merkleProof, users[1].address);
         expect(result.transactions).toHaveTransaction({
             on: airdrop.address,
             success: true,
@@ -134,7 +134,7 @@ describe('Airdrop', () => {
                 )
             );
             await helper.sendDeploy(users[i].getSender());
-            const result = await helper.sendClaim(123n, merkleProof);
+            const result = await helper.sendClaim(123n, merkleProof, users[i].address);
             expect(result.transactions).toHaveTransaction({
                 on: airdrop.address,
                 success: true,
@@ -166,7 +166,7 @@ describe('Airdrop', () => {
         await helper.sendDeploy(users[1].getSender());
 
         {
-            const result = await helper.sendClaim(123n, merkleProof);
+            const result = await helper.sendClaim(123n, merkleProof, users[1].address);
             expect(result.transactions).toHaveTransaction({
                 on: airdrop.address,
                 success: true,
@@ -182,7 +182,7 @@ describe('Airdrop', () => {
         }
 
         {
-            await expect(helper.sendClaim(123n, merkleProof)).rejects.toThrow();
+            await expect(helper.sendClaim(123n, merkleProof, users[1].address)).rejects.toThrow();
             expect(
                 await blockchain
                     .openContract(
@@ -194,7 +194,7 @@ describe('Airdrop', () => {
         }
 
         {
-            await expect(helper.sendClaim(123n, merkleProof)).rejects.toThrow();
+            await expect(helper.sendClaim(123n, merkleProof, users[1].address)).rejects.toThrow();
             expect(
                 await blockchain
                     .openContract(
@@ -220,7 +220,7 @@ describe('Airdrop', () => {
                 )
             );
             await helper.sendDeploy(users[1].getSender());
-            const result = await helper.sendClaim(123n, merkleProof);
+            const result = await helper.sendClaim(123n, merkleProof, users[1].address);
             expect(result.transactions).toHaveTransaction({
                 from: helper.address,
                 to: airdrop.address,
@@ -248,7 +248,7 @@ describe('Airdrop', () => {
                 )
             );
             await helper.sendDeploy(users[1].getSender());
-            const result = await helper.sendClaim(123n, merkleProof);
+            const result = await helper.sendClaim(123n, merkleProof, users[1].address);
             expect(result.transactions).toHaveTransaction({
                 from: helper.address,
                 to: airdrop.address,

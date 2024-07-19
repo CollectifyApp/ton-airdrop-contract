@@ -10,6 +10,7 @@ import {
     SendMode,
     Builder,
     Slice,
+    BitString
 } from '@ton/core';
 
 export type AirdropConfig = {
@@ -27,17 +28,17 @@ export function airdropConfigToCell(config: AirdropConfig): Cell {
 }
 
 export type AirdropEntry = {
-    address: Address;
+    code: BitString;
     amount: bigint;
 };
 
 export const airdropEntryValue = {
     serialize: (src: AirdropEntry, buidler: Builder) => {
-        buidler.storeAddress(src.address).storeCoins(src.amount);
+        buidler.storeBits(src.code).storeCoins(src.amount);
     },
     parse: (src: Slice) => {
         return {
-            address: src.loadAddress(),
+            code: src.loadBits(256),
             amount: src.loadCoins(),
         };
     },

@@ -86,6 +86,7 @@ global int context::query_id;
     elseif (context::op == op::process_claim) {
         cell proof_cell = in_msg_body~load_ref();
         int index = in_msg_body~load_uint(256);
+        slice recipient = in_msg_body;
 
         (slice cs, int exotic?) = proof_cell.begin_parse_exotic();
         throw_unless(42, exotic?);
@@ -94,11 +95,13 @@ global int context::query_id;
 
         cell dict = cs~load_ref();
         (slice entry, int found?) = dict.udict_get?(256, index);
+        _ = entry~load_bits(256);
+
         throw_unless(45, found?);
 
         throw_unless(error::wrong_sender, equal_slices(context::sender, helper_address(helper_stateinit(proof_cell.cell_hash(), index))));
 
-        send_tokens(entry~load_msg_addr(), entry~load_coins());
+        send_tokens(recipient, entry~load_coins());
     }
 
     else {

@@ -1,4 +1,4 @@
-import { Address, beginCell, toNano } from '@ton/core';
+import { Address, BitString, Cell, beginCell, toNano } from '@ton/core';
 import { Airdrop, AirdropEntry, generateEntriesDictionary } from '../wrappers/Airdrop';
 import { compile, NetworkProvider } from '@ton/blueprint';
 import { JettonMinter } from '../wrappers/JettonMinter';
@@ -6,15 +6,15 @@ import { JettonMinter } from '../wrappers/JettonMinter';
 export async function run(provider: NetworkProvider) {
     const entries: AirdropEntry[] = [
         {
-            address: Address.parse('EQBKgXCNLPexWhs2L79kiARR1phGH1LwXxRbNsCFF9doc2lN'),
+            code: new BitString(Buffer.from('aaa'), 0, 256),
             amount: toNano('1'),
         },
         {
-            address: Address.parse('EQBIhPuWmjT7fP-VomuTWseE8JNWv2q7QYfsVQ1IZwnMk8wL'),
+            code:  new BitString(Buffer.from('bbb'), 0, 256),
             amount: toNano('2'),
         },
         {
-            address: Address.parse('EQB4cwGljhouzFwc6EHpCacCtsK7_XIj-tNfM5udgW6IxO9R'),
+            code:  new BitString(Buffer.from('ccc'), 0, 256),
             amount: toNano('1.5'),
         },
     ];
@@ -23,8 +23,8 @@ export async function run(provider: NetworkProvider) {
     const dictCell = beginCell().storeDictDirect(dict).endCell();
     console.log(`Dictionary cell (store it somewhere on your backend: ${dictCell.toBoc().toString('base64')}`);
     const merkleRoot = BigInt('0x' + dictCell.hash().toString('hex'));
-
-    const jettonMinterAddress = Address.parse('EQD0vdSA_NedR9uvbgN9EikRX-suesDxGeFg69XQMavfLqIw');
+    console.log(merkleRoot)
+    const jettonMinterAddress = Address.parse('EQAmeBDlFDr6T45yoAaYMk85xjI51ildO-vg9EM13g3WYwov');
     const jettonMinter = provider.open(JettonMinter.createFromAddress(jettonMinterAddress));
 
     const airdrop = provider.open(
@@ -43,3 +43,5 @@ export async function run(provider: NetworkProvider) {
 
     // run methods on `airdrop`
 }
+
+console.log(toNano('1'))
